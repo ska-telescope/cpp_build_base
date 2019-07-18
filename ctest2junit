@@ -1,0 +1,10 @@
+#!/bin/bash
+
+if [ ! -f Testing/TAG ]; then
+	echo "No Testing/TAG file found, did ctest successfully run?" 1>&2
+	exit 1
+fi
+
+latest_test=`head -n 1 < Testing/TAG`
+results="Testing/$latest_test/Test.xml"
+xsltproc /usr/local/share/ctest2junit/ctest2junit.xsl "$results"

@@ -1,0 +1,56 @@
+# ICRAR - International Centre for Radio Astronomy Research
+# (c) UWA - The University of Western Australia, 2019
+# Copyright by UWA (in the framework of the ICRAR)
+# All rights reserved
+#
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License as published by the Free Software Foundation; either
+# version 2.1 of the License, or (at your option) any later version.
+#
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Lesser General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser General Public
+# License along with this library; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+# MA 02111-1307  USA
+
+image: docker:stable
+
+variables:
+  # Note that if you're using the Kubernetes executor, the variable should be set to
+  # tcp://localhost:2375/ because of how the Kubernetes executor connects services
+  # to the job container
+  # DOCKER_HOST: tcp://localhost:2375/
+  #
+  # For non-Kubernetes executors, we use tcp://docker:2375/
+  DOCKER_HOST: tcp://docker:2375/
+  # When using dind, it's wise to use the overlayfs driver for
+  # improved performance.
+  DOCKER_DRIVER: overlay2
+  IMAGE_NAME: cpp_build_base
+
+services:
+  - docker:dind
+
+before_script:
+  - docker login -u $DOCKER_REGISTRY_USER_LOGIN -p $CI_REGISTRY_PASS_LOGIN $CI_REGISTRY
+  - docker info
+
+stages:
+  - build
+
+build_docker:
+  retry: 2
+  stage: build
+  tags:
+    - docker-executor
+  script:
+    - version=`cat VERSION`
+    - docker build -t $DOCKER_REGISTRY_HOST/$DOCKER_REGISTRY_USER/$IMAGE_NAME:$version .
+    - docker tag $DOCKER_REGISTRY_HOST/$DOCKER_REGISTRY_USER/$IMAGE_NAME:$version $DOCKER_REGISTRY_HOST/$DOCKER_REGISTRY_USER/$IMAGE_NAME:latest
+    - docker push $DOCKER_REGISTRY_HOST/$DOCKER_REGISTRY_USER/$IMAGE_NAME:$version
+    - docker push $DOCKER_REGISTRY_HOST/$DOCKER_REGISTRY_USER/$IMAGE_NAME:latest
