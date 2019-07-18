@@ -37,7 +37,7 @@ services:
   - docker:dind
 
 before_script:
-  - docker login -u $DOCKER_REGISTRY_USER_LOGIN -p $CI_REGISTRY_PASS_LOGIN $CI_REGISTRY
+  - docker login -u $DOCKER_REGISTRY_USER -p $DOCKER_REGISTRY_PASSWORD $DOCKER_REGISTRY_HOST
   - docker info
 
 stages:
@@ -50,7 +50,7 @@ build_docker:
     - docker-executor
   script:
     - version=`cat VERSION`
-    - docker build -t $DOCKER_REGISTRY_HOST/$DOCKER_REGISTRY_USER/$IMAGE_NAME:$version .
-    - docker tag $DOCKER_REGISTRY_HOST/$DOCKER_REGISTRY_USER/$IMAGE_NAME:$version $DOCKER_REGISTRY_HOST/$DOCKER_REGISTRY_USER/$IMAGE_NAME:latest
-    - docker push $DOCKER_REGISTRY_HOST/$DOCKER_REGISTRY_USER/$IMAGE_NAME:$version
-    - docker push $DOCKER_REGISTRY_HOST/$DOCKER_REGISTRY_USER/$IMAGE_NAME:latest
+    - docker build -t $DOCKER_REGISTRY_HOST/$DOCKER_REGISTRY_FOLDER/$IMAGE_NAME:$version .
+    - docker tag $DOCKER_REGISTRY_HOST/$DOCKER_REGISTRY_FOLDER/$IMAGE_NAME:$version $DOCKER_REGISTRY_HOST/$DOCKER_REGISTRY_FOLDER/$IMAGE_NAME:latest
+    - docker push $DOCKER_REGISTRY_HOST/$DOCKER_REGISTRY_FOLDER/$IMAGE_NAME:$version
+    - docker push $DOCKER_REGISTRY_HOST/$DOCKER_REGISTRY_FOLDER/$IMAGE_NAME:latest
