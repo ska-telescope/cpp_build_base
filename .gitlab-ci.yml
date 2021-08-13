@@ -21,7 +21,7 @@
 image: docker:stable
 
 variables:
-  IMAGE_NAME: cpp_build_base
+  PROJECT: ska-cicd-cpp-build-base
 
 stages:
   - build
