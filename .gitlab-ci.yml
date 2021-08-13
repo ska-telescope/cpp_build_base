@@ -36,21 +36,10 @@ variables:
 services:
   - docker:dind
 
-before_script:
-  - docker login -u $DOCKER_REGISTRY_USERNAME -p $DOCKER_REGISTRY_PASSWORD $DOCKER_REGISTRY_HOST
-  - docker info
-
 stages:
   - build
 
-build_docker:
-  retry: 2
-  stage: build
-  tags:
-    - docker-executor
-  script:
-    - version=`cat VERSION`
-    - docker build -t $DOCKER_REGISTRY_HOST/$DOCKER_REGISTRY_FOLDER/$IMAGE_NAME:$version .
-    - docker tag $DOCKER_REGISTRY_HOST/$DOCKER_REGISTRY_FOLDER/$IMAGE_NAME:$version $DOCKER_REGISTRY_HOST/$DOCKER_REGISTRY_FOLDER/$IMAGE_NAME:latest
-    - docker push $DOCKER_REGISTRY_HOST/$DOCKER_REGISTRY_FOLDER/$IMAGE_NAME:$version
-    - docker push $DOCKER_REGISTRY_HOST/$DOCKER_REGISTRY_FOLDER/$IMAGE_NAME:latest
+include:
+  - project: 'ska-telescope/templates-repository'
+    file: 'gitlab-ci/includes/build_push.yml'
+
