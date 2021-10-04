@@ -26,14 +26,36 @@ variables:
 stages:
 - lint
 - build
+- test
 - publish
+
+
+oci-image-lint:
+  image: $SKA_K8S_TOOLS_DEPLOY_IMAGE
+  stage: lint
+  tags:
+    - k8srunner
+  before_script:
+    - '[ -f .make/oci.mk ] || (echo "File oci.mk not included in Makefile; exit 1")'
+    - 'make help | grep oci.mk:oci-lint'
+  script:
+    - make oci-lint
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push"'
+      # exists:
+      #   - Dockerfile
+      #   - images/*
+
+
 
 # Include CI templates
 include:
 # OCI Images - avoid the default test stage, as we don't have one
-  - project: 'ska-telescope/templates-repository'
-    file: 'gitlab-ci/includes/oci-image-lint.gitlab-ci.yml'
+  # - project: 'ska-telescope/templates-repository'
+  #   file: 'gitlab-ci/includes/oci-image-lint.gitlab-ci.yml'
   - project: 'ska-telescope/templates-repository'
     file: 'gitlab-ci/includes/oci-image-build.gitlab-ci.yml'
+  - project: 'ska-telescope/templates-repository'
+    file: 'gitlab-ci/includes/oci-image-test.gitlab-ci.yml'
   - project: 'ska-telescope/templates-repository'
     file: 'gitlab-ci/includes/oci-image-publish.gitlab-ci.yml'
