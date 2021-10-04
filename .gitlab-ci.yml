@@ -30,12 +30,69 @@ stages:
 - publish
 - scan
 
+# # Include CI templates
+# include:
+# # OCI Images
+#   - project: 'ska-telescope/templates-repository'
+#     file: 'gitlab-ci/includes/oci-image.gitlab-ci.yml'
+
+
 # Include CI templates
 include:
 # OCI Images
   - project: 'ska-telescope/templates-repository'
-    file: 'gitlab-ci/includes/oci-image.gitlab-ci.yml'
+    file: 'gitlab-ci/includes/oci-image-build.gitlab-ci.yml'
 
-container scanning for MRs:
+
+.container-scanning:
+  stage: scan
+  tags:
+    - k8srunner
+  image:
+    name: docker.io/aquasec/trivy:latest
+    entrypoint: [""]
   variables:
-    TRIVY_OCI_REGISTRY_HOST: "registry.gitlab.com/ska-telescope/ska-cicd-cpp-build-base"
+  allow_failure: true
+  before_script:
+  - |
+    apk add bash make curl
+  cache:
+    paths:
+      - .trivycache/
+  artifacts:
+    when: always
+    reports:
+      container_scanning: gl-container-scanning-report.json
+
+# Executed on the image from the gitlab registry
+container scanning for MRs:
+  extends:
+    - .container-scanning
+  script:
+    - make oci-scan-all CAR_OCI_REGISTRY_HOST=${CI_REGISTRY}/${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}
+    # - make oci-scan OCI_IMAGE=${CI_PROJECT_NAME} CAR_OCI_REGISTRY_HOST=${CI_REGISTRY}/${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}
+  rules:
+  - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_REF_NAME != $CI_DEFAULT_BRANCH' # Run on push, not default branch - avoid detached
+    exists:
+      - Dockerfile
+      - images/**/*
+
+# Executed on the image from the CAR
+container scanning for default branch:
+  extends:
+    - .container-scanning
+  script:
+    - make oci-scan-all CAR_OCI_REGISTRY_HOST=${CAR_OCI_REGISTRY_HOST}
+    # - make oci-scan OCI_IMAGE=${CI_PROJECT_NAME} CAR_OCI_REGISTRY_HOST=${CAR_OCI_REGISTRY_HOST}
+  rules:
+  - if: $FULL_IMAGE_NAME # Run if triggered externally
+    variables:
+      OVERRIDE_FULL_IMAGE_NAME: "true"
+  - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH # Run on default branch
+    exists:
+      - Dockerfile
+      - images/**/*
+  - if: $CI_COMMIT_TAG # Run on tags
+    exists:
+      - Dockerfile
+      - images/**/*
