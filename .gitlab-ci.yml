@@ -28,6 +28,7 @@ stages:
 - build
 - test
 - publish
+- scan
 
 # Include CI templates
 include:
@@ -35,10 +36,6 @@ include:
   - project: 'ska-telescope/templates-repository'
     file: 'gitlab-ci/includes/oci-image.gitlab-ci.yml'
 
-container scanning for main branch:
-  variables:
-    CAR_OCI_REGISTRY_HOST: "registry.gitlab.com/ska-telescope/ska-cicd-cpp-build-base"
-
 container scanning for MRs:
   variables:
-    CAR_OCI_REGISTRY_HOST: "registry.gitlab.com/ska-telescope/ska-cicd-cpp-build-base"
+    TRIVY_OCI_REGISTRY_HOST: "registry.gitlab.com/ska-telescope/ska-cicd-cpp-build-base"
