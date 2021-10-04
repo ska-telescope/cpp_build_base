@@ -35,6 +35,7 @@ include:
 # OCI Images
   - project: 'ska-telescope/templates-repository'
     file: 'gitlab-ci/includes/oci-image.gitlab-ci.yml'
+    ref: st-1675-change-scan-stage
 
 container scanning for MRs:
   variables:
