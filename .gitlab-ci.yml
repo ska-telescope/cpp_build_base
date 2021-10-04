@@ -42,9 +42,9 @@ oci-image-lint:
     - make oci-lint
   rules:
     - if: '$CI_PIPELINE_SOURCE == "push"'
-      # exists:
-      #   - Dockerfile
-      #   - images/*
+      exists:
+        - Dockerfile
+        - images/*
 
 
 
