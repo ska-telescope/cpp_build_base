@@ -37,10 +37,8 @@ include:
 
 container scanning for main branch:
   variables:
-    OVERRIDE_FULL_IMAGE_NAME: "true"
     CAR_OCI_REGISTRY_HOST: "registry.gitlab.com/ska-telescope/ska-cicd-cpp-build-base"
 
 container scanning for MRs:
   variables:
-    OVERRIDE_FULL_IMAGE_NAME: "true"
     CAR_OCI_REGISTRY_HOST: "registry.gitlab.com/ska-telescope/ska-cicd-cpp-build-base"
