@@ -46,7 +46,7 @@ oci-image-lint:
         - Dockerfile
     - if: '$CI_PIPELINE_SOURCE == "push"'
       exists:
-        - images
+        - images/**/*
 
 
 
