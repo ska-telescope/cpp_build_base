@@ -26,14 +26,11 @@ variables:
 stages:
 - lint
 - build
+- test
 - publish
 
 # Include CI templates
 include:
-# OCI Images - avoid the default test stage, as we don't have one
+# OCI Images
   - project: 'ska-telescope/templates-repository'
-    file: 'gitlab-ci/includes/oci-image-lint.gitlab-ci.yml'
-  - project: 'ska-telescope/templates-repository'
-    file: 'gitlab-ci/includes/oci-image-build.gitlab-ci.yml'
-  - project: 'ska-telescope/templates-repository'
-    file: 'gitlab-ci/includes/oci-image-publish.gitlab-ci.yml'
+    file: 'gitlab-ci/includes/oci-image.gitlab-ci.yml'
