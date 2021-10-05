@@ -35,7 +35,3 @@ include:
 # OCI Images
   - project: 'ska-telescope/templates-repository'
     file: 'gitlab-ci/includes/oci-image.gitlab-ci.yml'
-
-container scanning for MRs:
-  variables:
-    TRIVY_OCI_REGISTRY_HOST: "registry.gitlab.com/ska-telescope/ska-cicd-cpp-build-base"
