@@ -9,6 +9,7 @@ RUN apt-get update && \
       g++ \
       gcovr \
       iwyu \
+      make \
       valgrind \
       xsltproc \
     && rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/*
